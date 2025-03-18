@@ -1,8 +1,10 @@
-import React, { useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useRouter } from 'expo-router';
-import {View,Text,StyleSheet,Image,TouchableOpacity,TextInput,Dimensions,ScrollView,KeyboardAvoidingView,Platform,Animated,} from 'react-native';
+import {View,Text,StyleSheet,TouchableOpacity,TextInput,Dimensions,KeyboardAvoidingView,Platform,Button} from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-import { MaterialIcons, FontAwesome5, Ionicons, AntDesign } from '@expo/vector-icons';
+import { FontAwesome5, Ionicons, AntDesign } from '@expo/vector-icons';
+import { useGoogleAuth } from '@/src/api/GoogleAuthService';
+
 
 const { width, height } = Dimensions.get('window');
 
@@ -14,10 +16,14 @@ export default function Index() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLogin, setIsLogin] = useState(true);
 
+  const { signInWithGoogle, userInfo, loading, error } = useGoogleAuth();
 
   const skipToLogin = () => {
     setIsLogin(true);
   };
+
+  // Automatically navigate to home page if user is logged in
+
 
   const handleLogin = () => {
     if (!email ||!password) {
@@ -43,6 +49,12 @@ export default function Index() {
     setIsLogin(!isLogin);
   };
 
+  useEffect(() => {
+    if (userInfo) {
+      router.replace('../home/');
+    }
+  }, [userInfo]);
+
   if (!isLogin) {
     return (
       <Text>you not login</Text>
@@ -64,7 +76,7 @@ export default function Index() {
           <View style={styles.logoContainer}>
             <FontAwesome5 name="business-time" size={40} color="white" />
           </View>
-          <Text style={styles.loginTitle}>Business Pro</Text>
+          <Text style={styles.loginTitle}>Easy Sheet</Text>
           <Text style={styles.loginSubtitle}>
             {isLogin ? "Welcome back! Let's sign you in" : "Create an account to get started"}
           </Text>
@@ -126,7 +138,7 @@ export default function Index() {
         </View>
 
         <View style={styles.socialLoginContainer}>
-          <TouchableOpacity style={styles.loginButton} onPress={handleLogin}>
+          <TouchableOpacity style={styles.loginButton} onPress={() => signInWithGoogle()}>
             <LinearGradient
               colors={['#363339', '#000000']}
               style={styles.gradient}
@@ -141,17 +153,8 @@ export default function Index() {
               </View>
             </LinearGradient>
           </TouchableOpacity>
-
         </View>
 
-        <TouchableOpacity style={styles.switchModeContainer} onPress={toggleAuthMode}>
-          <Text style={styles.switchModeText}>
-            {isLogin ? "Don't have an account? " : "Already have an account? "}
-            <Text style={styles.switchModeHighlight}>
-              {isLogin ? 'Sign Up' : 'Sign In'}
-            </Text>
-          </Text>
-        </TouchableOpacity>
       </View>
     </KeyboardAvoidingView>
   );
@@ -362,12 +365,6 @@ const styles = StyleSheet.create({
     color: '#4158D0',
     fontSize: 14,
     fontWeight: '600',
-  },
-  loginButton: {
-    borderRadius: 12,
-    overflow: 'hidden',
-    elevation: 4,
-
   },
   loginButtonGradient: {
     paddingVertical: 16,

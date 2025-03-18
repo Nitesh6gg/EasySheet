@@ -12,7 +12,7 @@
       "supportsTablet": true
     },
     "android": {
-      "package": "npm install -g expo-cli\n",
+      "package": "com.easySheet",
       "permissions": [
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"

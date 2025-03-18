@@ -3,8 +3,12 @@ import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { LineChart } from 'react-native-chart-kit';
 import { Dimensions, Platform } from 'react-native';
+import { useGoogleAuth } from '@/src/api/GoogleAuthService';
+import { useEffect } from 'react';
 
 export default function Index() {
+
+  const {userInfo} = useGoogleAuth();
   const router = useRouter();
   const screenWidth = Dimensions.get('window').width;
 
@@ -41,11 +45,17 @@ export default function Index() {
     }),
   };
 
+  //if user not login then push to login page
+ /* useEffect(() => {
+    if(!userInfo){
+      router.push('../');
+    }
+  }, []);*/
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.headerTitle}>Welcome,Nitesh</Text>
-        {/*<Text style={styles.date}>{new Date().toLocaleDateString()}</Text>*/}
+        <Text style={styles.headerTitle}>Welcome,{userInfo? userInfo.name:'Guest'}</Text>
         <TouchableOpacity style={styles.profileButton} onPress={() => router.push('../settings')}>
           <MaterialCommunityIcons name="account-circle" size={32} color="#333" />
         </TouchableOpacity>
@@ -92,7 +102,7 @@ export default function Index() {
           </Pressable>
           <Pressable
             style={styles.actionButton}
-            onPress={() => router.push('/sales')}>
+            onPress={() => router.push('../sales')}>
             <Ionicons name="cart" size={24} color="#007AFF" />
             <Text style={styles.actionText}>New Sale</Text>
           </Pressable>
@@ -104,7 +114,7 @@ export default function Index() {
           </Pressable>
           <Pressable
             style={styles.actionButton}
-            onPress={() => router.push('/analytics')}>
+            onPress={() => router.push('../analytics')}>
             <Ionicons name="stats-chart" size={24} color="#007AFF" />
             <Text style={styles.actionText}>Reports</Text>
           </Pressable>

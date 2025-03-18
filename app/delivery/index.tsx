@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import {View,Text,StyleSheet,FlatList,TouchableOpacity,Modal,TextInput,ActivityIndicator,Image,ScrollView,SafeAreaView,Dimensions,StatusBar,Alert,} from 'react-native';
 import { Camera } from 'expo-camera';
 import { BarCodeScanner } from 'expo-barcode-scanner';
@@ -6,44 +6,12 @@ import { MaterialIcons, Feather, Ionicons, FontAwesome5, MaterialCommunityIcons 
 import { LinearGradient } from 'expo-linear-gradient';
 import { convertSheetDataToObjects, SheetResponse } from '@/src/util/sheetDataConverter';
 import {SHEETS_API_URL} from '@/src/config/sheetConfig';
+import {SpreadsheetContext} from '@/src/context/SpreadsheetContext';
 
 const sheetRange="Sheet1!A1:Q999";
 
-// Sample data for orders
-const initialOrders = [
-  {
-    id: '1',
-    productName: 'iPhone 15 Pro Max',
-    orderDate: '2025-02-20',
-    color: 'Titanium Blue',
-    customerName: 'John Williams',
-    phoneNumber: '+1 (555) 123-4567',
-    status: 'Pending',
-    address: '1234 Tech Lane, Silicon Valley, CA 94024',
-    price: '$1,299.00',
-    paymentMethod: 'Credit Card',
-    barcode: 'IPHONE15PM-1234567',
-    imageUrl: 'https://api.a0.dev/assets/image?text=iphone%2015%20pro%20max%20titanium%20blue%20on%20minimalist%20background&aspect=1:1&seed=42',
-  },
-  {
-    id: '2',
-    productName: 'Samsung Galaxy S24 Ultra',
-    orderDate: '2025-02-21',
-    color: 'Phantom Black',
-    customerName: 'Emma Davis',
-    phoneNumber: '+1 (555) 987-6543',
-    status: 'Pending',
-    address: '567 Innovation Dr, Austin, TX 78701',
-    price: '$1,199.99',
-    paymentMethod: 'PayPal',
-    barcode: 'GALAXYS24U-7654321',
-    imageUrl: 'https://api.a0.dev/assets/image?text=samsung%20galaxy%20s24%20ultra%20black%20sleek%20smartphone&aspect=1:1&seed=24',
-  },
-
-];
-
 export default function DeliveryManagementScreen() {
-  //const [orders, setOrders] = useState(initialOrders);
+
   const [orders, setOrders] = useState<Record<string, string>[]>([]);
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [detailsModalVisible, setDetailsModalVisible] = useState(false);
@@ -56,11 +24,15 @@ export default function DeliveryManagementScreen() {
   const [confirmDeliveryModal, setConfirmDeliveryModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [filteredOrders, setFilteredOrders] = useState(orders);
+  const {selectedSheet} = useContext(SpreadsheetContext);
 
 
 
   //calling api
   useEffect(() => {
+
+    console.log('your selected sheet is {}', selectedSheet);
+
     const fetchSheetData = async () => {
       try {
         const response = await fetch(SHEETS_API_URL);
